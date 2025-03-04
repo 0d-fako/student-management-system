@@ -6,10 +6,10 @@ from app.course import Course
 
 
 class User(ABC):
-    def __init__(self, email: str, password: bytes):
+    def __init__(self, email: str, password: str):
         self._name = None
         self._email = email
-        self._password = password
+        self._password: bytes = self.__encrypt(password)
         self._is_authenticated = False
 
     @property
@@ -27,7 +27,8 @@ class User(ABC):
     def is_authenticated(self, email: str, password: str):
         if self._email == email: bcrypt.checkpw(password.encode('utf-8'), self._password)
 
-
+    def __encrypt(self, password):
+        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
 
 class Student(User):
