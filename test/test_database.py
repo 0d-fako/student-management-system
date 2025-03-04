@@ -1,16 +1,17 @@
 
 import unittest
 import bcrypt
-from app.database import DatabaseManager
-from app.user import Student, Instructor
-from app.course import Course
+
+from src.app.course import Course
+from src.app.database import DatabaseManager
+from src.app.user import Student, Instructor
 
 
 class TestDatabaseManager(unittest.TestCase):
     def setUp(self):
         self.db = DatabaseManager("test_data")
-        self.student = Student("student@example.com", bcrypt.hashpw(b"password", bcrypt.gensalt()).decode(), "John", "Doe")
-        self.instructor = Instructor("instructor@example.com", bcrypt.hashpw(b"password", bcrypt.gensalt()).decode(), "Jane", "Smith")
+        self.student = Student("student@example.com", bcrypt.hashpw(b"password", bcrypt.gensalt()).decode())
+        self.instructor = Instructor("instructor@example.com", bcrypt.hashpw(b"password", bcrypt.gensalt()).decode())
         self.course = Course("CS101", "Introduction to Computer Science", self.instructor)
         self.course.add_student(self.student)
         self.course.set_grade(self.student, "A")
