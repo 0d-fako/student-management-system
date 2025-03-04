@@ -2,7 +2,7 @@ from abc import ABC
 
 import bcrypt
 
-from app.course import Course
+from src.app.course import Course
 
 
 class User(ABC):
