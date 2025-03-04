@@ -1,5 +1,7 @@
 from abc import ABC
 
+import bcrypt
+
 from app.course import Course
 
 
@@ -21,6 +23,9 @@ class User(ABC):
     @name.setter
     def name(self, name: str):
         self._name = name
+
+    def is_authenticated(self, email: str, password: str):
+        if self._email == email: bcrypt.checkpw(password.encode('utf-8'), self._password)
 
 
 
