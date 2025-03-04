@@ -1,3 +1,6 @@
+from src.app.user import Student, Instructor, UserManager
+from src.app.course import Course
+
 class DatabaseManager:
     def __init__(self, data_dir="data"):
         self.data_dir = data_dir
@@ -7,35 +10,29 @@ class DatabaseManager:
     
     def _create_directory_and_files(self):
         try:
+            os.makedirs(self.data_dir, exist_ok=True)
             open(self.users_file, "a").close()
             open(self.courses_file, "a").close()
-        except FileNotFoundError:
-            try:
-                open(self.data_dir + "/dummy.txt", "w").close()
-                open(self.users_file, "w").close()
-                open(self.courses_file, "w").close()
-            except:
-                pass 
+        except Exception as e:
+            print(f"Error creating directories: {e}")
     
     def save_users(self, users):
         with open(self.users_file, "w") as f:
             for user in users:
-                user_type = "instructor" if user.__class__.__name__ == "Instructor" else "student"
-                f.write(f"{user.email},{user.hashed_password},{user_type}\n")
+                user_type = "instructor" if isinstance(user, Instructor) else "student"
+                f.write(f"{user._first_name},{user._last_name},{user.email},{user._password.decode('utf-8')},{user_type}\n")
     
     def load_users(self):
-        from user import Student, Instructor 
-        users = []
+        user_manager = UserManager()
         try:
             with open(self.users_file, "r") as f:
                 for line in f:
-                    email, hashed_password, user_type = line.strip().split(",")
-                    if user_type == "instructor":
-                        user = Instructor(email, hashed_password)
-                    else:
-                        user = Student(email, hashed_password)
-                    users.append(user)
-            return users
+                    first_name, last_name, email, password, user_type = line.strip().split(",")
+                    try:
+                        user_manager.register_user(user_type, first_name, last_name, email, password)
+                    except ValueError as e:
+                        print(f"Error loading user: {e}")
+            return user_manager.get_users()
         except Exception as e:
             print(f"Error loading users: {e}")
             return []
@@ -48,29 +45,25 @@ class DatabaseManager:
                 f.write(f"{course.course_code},{course.course_name},{instructor_email},{student_grades}\n")
     
     def load_courses(self, users):
-        from course import Course 
-    
         courses = []
         try:
             with open(self.courses_file, "r") as f:
                 for line in f:
                     course_code, course_name, instructor_email, student_grades_str = line.strip().split(",")
-                    
+                
                     instructor = next((user for user in users if user.email == instructor_email), None)
-                    if not instructor:
-                        print(f"Instructor not found for course: {course_code}")
-                        continue
                     
-                    course = Course(course_code, course_name, instructor)
+                    course = Course(course_code, course_name)
+                    if instructor:
+                        instructor.create_course(course)
                     
-
                     if student_grades_str != "None":
                         for student_grade in student_grades_str.split(";"):
                             student_email, grade = student_grade.split(":")
                             student = next((user for user in users if user.email == student_email), None)
                             if student:
-                                course.add_student(student)
-                                course.set_grade(student, grade)
+                                student.enroll_to(course)
+                                student._grades[course] = grade
                     
                     courses.append(course)
             return courses
