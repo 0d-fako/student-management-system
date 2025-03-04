@@ -21,7 +21,7 @@ class DatabaseManager:
         with open(self.users_file, "w") as f:
             for user in users:
                 user_type = "instructor" if user.__class__.__name__ == "Instructor" else "student"
-                f.write(f"{user.email},{user.hashed_password},{user.first_name},{user.last_name},{user_type}\n")
+                f.write(f"{user.email},{user.hashed_password},{user_type}\n")
     
     def load_users(self):
         from user import Student, Instructor 
@@ -29,11 +29,11 @@ class DatabaseManager:
         try:
             with open(self.users_file, "r") as f:
                 for line in f:
-                    email, hashed_password, first_name, last_name, user_type = line.strip().split(",")
+                    email, hashed_password, user_type = line.strip().split(",")
                     if user_type == "instructor":
-                        user = Instructor(email, hashed_password, first_name, last_name)
+                        user = Instructor(email, hashed_password)
                     else:
-                        user = Student(email, hashed_password, first_name, last_name)
+                        user = Student(email, hashed_password)
                     users.append(user)
             return users
         except Exception as e:
