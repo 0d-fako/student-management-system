@@ -5,12 +5,16 @@ class Course:
     def __init__(self, course_code: str, course_name:str):
         self._course_code: str = course_code
         self._course_name = course_name
-        self._instructor: ['Instructor', None] = None
+        # self._instructor: ['Instructor', None] = None
+        self.__instructor = None
         self._students: ['Student'] = []
 
 
     def get_students(self):
         return self._students
+
+    def get_instructor(self):
+        return self.__instructor
 
     @property
     def instructor(self):
