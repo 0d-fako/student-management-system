@@ -50,16 +50,13 @@ class DatabaseManager:
             with open(self.courses_file, "r") as f:
                 for line in f:
                     course_code, course_name, instructor_email, student_grades_str = line.strip().split(",")
-                    
-                    # Find instructor
+                
                     instructor = next((user for user in users if user.email == instructor_email), None)
                     
-                    # Create course
                     course = Course(course_code, course_name)
                     if instructor:
                         instructor.create_course(course)
                     
-                    # Add students and grades
                     if student_grades_str != "None":
                         for student_grade in student_grades_str.split(";"):
                             student_email, grade = student_grade.split(":")
