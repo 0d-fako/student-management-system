@@ -1,3 +1,5 @@
+import bcrypt
+
 class AuthenticationService:
     @staticmethod
     def hash_password(password: str) -> str:
