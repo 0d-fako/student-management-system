@@ -1,44 +1,54 @@
-
 import unittest
-import bcrypt
-
+import os
 from src.app.course import Course
+from src.app.instructor import Instructor
+from src.app.user import User
 from src.app.database import DatabaseManager
-from src.app.user import Student, Instructor
 
 
 class TestDatabaseManager(unittest.TestCase):
     def setUp(self):
-        self.db = DatabaseManager("test_data")
-        self.student = Student("student@example.com", bcrypt.hashpw(b"password", bcrypt.gensalt()).decode())
-        self.instructor = Instructor("instructor@example.com", bcrypt.hashpw(b"password", bcrypt.gensalt()).decode())
-        self.course = Course("CS101", "Introduction to Computer Science", self.instructor)
-        self.course.add_student(self.student)
-        self.course.set_grade(self.student, "A")
+        self.temp_file = "test_data.txt"
+        self.temp_users_file = "test_users.txt"
+        self.temp_courses_file = "test_courses.txt"
+
+        self.mock_user = User("test@example.com", "password123", "Test", "User")
+        self.mock_user._hashed_password = "hashed_password"
+
+        self.mock_instructor = Instructor("instructor@example.com", "password123", "Instructor", "Test")
+        self.mock_course = Course("CS101", "Intro to Computer Science", self.mock_instructor, 30)
 
     def tearDown(self):
-        open(self.db.users_file, "w").close()
-        open(self.db.courses_file, "w").close()
+        # Clean up temporary files
+        for file in [self.temp_file, self.temp_users_file, self.temp_courses_file]:
+            if os.path.exists(file):
+                os.remove(file)
+
+    def test_save_and_load_data(self):
+        data = ["line1", "line2", "line3"]
+        DatabaseManager.save_data(self.temp_file, data)
+        loaded_data = DatabaseManager.load_data(self.temp_file)
+        self.assertEqual(data, loaded_data)
 
     def test_save_and_load_users(self):
-        self.db.save_users([self.student, self.instructor])
-
-        loaded_users = self.db.load_users()
-        self.assertEqual(len(loaded_users), 2)
-        self.assertEqual(loaded_users[0].email, "student@example.com")
-        self.assertEqual(loaded_users[1].email, "instructor@example.com")
+        users = [self.mock_user]
+        DatabaseManager.save_users(self.temp_users_file, users)
+        loaded_users = DatabaseManager.load_users(self.temp_users_file)
+        self.assertEqual(len(users), len(loaded_users))
+        self.assertEqual(users[0].email, loaded_users[0].email)
+        self.assertEqual(users[0].first_name, loaded_users[0].first_name)
 
     def test_save_and_load_courses(self):
-        self.db.save_users([self.student, self.instructor])
-        self.db.save_courses([self.course])
-        loaded_courses = self.db.load_courses([self.student, self.instructor])
+        instructors = [self.mock_instructor]
+        courses = [self.mock_course]
+        DatabaseManager.save_courses(self.temp_courses_file, courses)
+        loaded_courses = DatabaseManager.load_courses(self.temp_courses_file, instructors)
+        self.assertEqual(len(courses), len(loaded_courses))
+        self.assertEqual(courses[0].course_code, loaded_courses[0].course_code)
+        self.assertEqual(courses[0].instructor.email, loaded_courses[0].instructor.email)
 
-        self.assertEqual(len(loaded_courses), 1)
-        self.assertEqual(loaded_courses[0].course_code, "CS101")
-        self.assertEqual(loaded_courses[0].course_name, "Introduction to Computer Science")
-        self.assertEqual(loaded_courses[0].instructor.email, "instructor@example.com")
-        self.assertEqual(loaded_courses[0].student_grades[self.student], "A")
+    def test_load_nonexistent_file(self):
+        non_existent_file = "non_existent.txt"
+        loaded_data = DatabaseManager.load_data(non_existent_file)
+        self.assertEqual(loaded_data, [])
 
-
-if __name__ == "__main__":
-    unittest.main()
