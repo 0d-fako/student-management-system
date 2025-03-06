@@ -1,6 +1,5 @@
 from enum import Enum
-from typing import Dict, Optional
-
+from typing import Dict, Optional, List
 
 
 class CourseGrade(Enum):
@@ -37,3 +36,23 @@ class Course:
 
     def get_student_grade(self, student) -> Optional[CourseGrade]:
         return self.enrolled_students.get(student)
+
+    def get_students(self) -> List['Student']:
+        return list(self.enrolled_students.keys())
+
+    def get_course_id(self) -> str:
+        return self.course_code
+
+    def get_course_name(self) -> str:
+        return self.course_name
+
+    def get_instructor(self):
+        return self.instructor
+
+    def is_full(self) -> bool:
+        return len(self.enrolled_students) >= self.max_capacity
+
+    def get_enrollment_count(self) -> int:
+        return len(self.enrolled_students)
+
+
