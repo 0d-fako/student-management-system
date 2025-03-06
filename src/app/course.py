@@ -1,55 +1,58 @@
-from src.app.user import Student
+from enum import Enum
+from typing import Dict, Optional, List
+
+
+class CourseGrade(Enum):
+    A = 4.0
+    B = 3.0
+    C = 2.0
+    D = 1.0
+    F = 0.0
 
 
 class Course:
-    def __init__(self, course_code: str, course_name: str):
-        self._course_code: str = course_code
-        self._course_name: str = course_name
-        self._instructor = None
-        self._students: list = []
+    def __init__(self, course_code: str, course_name: str, instructor=None, max_capacity: int = 30):
+        self.course_code = course_code
+        self.course_name = course_name
+        self.instructor = instructor
+        self.max_capacity = max_capacity
+        self.enrolled_students: Dict['Student', Optional[CourseGrade]] = {}
 
-    @property
-    def course_code(self) -> str:
-        return self._course_code
+    def add_student(self, student: 'Student') -> bool:
+        if len(self.enrolled_students) < self.max_capacity:
+            self.enrolled_students[student] = None
+            return True
+        return False
 
-    @property
-    def course_name(self) -> str:
-        return self._course_name
+    def remove_student(self, student) -> bool:
+        if student in self.enrolled_students:
+            del self.enrolled_students[student]
+            return True
+        return False
 
-    @property
-    def instructor(self):
-        return self._instructor
+    def set_student_grade(self, student, grade: CourseGrade):
+        if student in self.enrolled_students:
+            self.enrolled_students[student] = grade
 
-    @instructor.setter
-    def instructor(self, instructor):
-        self._instructor = instructor
+    def get_student_grade(self, student) -> Optional[CourseGrade]:
+        return self.enrolled_students.get(student)
 
-    def enroll_student(self, student):
-        if student in self._students:
-            raise ValueError(f"Student {student.name} is already enrolled in this course.")
-        student.enroll_to(self)
-        self._students.append(student)
+    def get_students(self) -> List['Student']:
+        return list(self.enrolled_students.keys())
 
-    def unenroll_student(self, student):
-        if student not in self._students:
-            raise ValueError(f"Student {student.name} is not enrolled in this course.")
-        student.remove_course(self)
-        self._students.remove(student)
+    def get_course_id(self) -> str:
+        return self.course_code
 
-    def get_students(self) -> list:
-        return self._students
+    def get_course_name(self) -> str:
+        return self.course_name
 
-    def assign_grade(self, student, grade: float):
-        if student not in self._students:
-            raise ValueError(f"Student {student.name} is not enrolled in this course.")
-        student.assign_grade(self, grade)
+    def get_instructor(self):
+        return self.instructor
 
-    def get_grades(self) -> dict:
-        grades = {}
-        for student in self._students:
-            grades[student.email] = student.get_student_grade(self)
-        return grades
+    def is_full(self) -> bool:
+        return len(self.enrolled_students) >= self.max_capacity
 
-    def __str__(self):
-        instructor_name = self._instructor.name if self._instructor else "No instructor"
-        return f"Course: {self._course_code} - {self._course_name} (Instructor: {instructor_name})"
+    def get_enrollment_count(self) -> int:
+        return len(self.enrolled_students)
+
+

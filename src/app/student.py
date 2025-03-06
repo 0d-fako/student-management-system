@@ -1,37 +1,38 @@
-from src.app.course import Course
-from user import User
+from typing import List
+
+from src.app.user import User
 
 
 class Student(User):
-    def __init__(self, first_name, last_name, email, hashed_password):
-        super().__init__(first_name, last_name, email, hashed_password)
-        self.__enrolled_courses: ['Course'] = []
-        self.__student_grade = {}
+    def __init__(self, email: str, password: str, first_name: str = '', last_name: str = ''):
+        super().__init__(email, password, first_name, last_name)
+        self.enrolled_courses: List['Course'] = []
 
-    def view_enrolled_courses(self):
-        return self.__enrolled_courses
+    def enroll_in_course(self, course: 'Course') -> bool:
+        if course.add_student(self) and course not in self.enrolled_courses:
+            self.enrolled_courses.append(course)
+            return True
+        return False
 
-    def view_course_grade(self, course: Course):
-        return self.__enrolled_courses
+    def drop_course(self, course: 'Course') -> bool:
+        if course in self.enrolled_courses:
+            course.remove_student(self)
+            self.enrolled_courses.remove(course)
+            return True
+        return False
 
-    def view_instructor_for_course(self, course: Course):
-        if course in self.__enrolled_courses:
-            return course.get_instructor()
+    def view_enrolled_courses(self) -> List['Course']:
+        return self.enrolled_courses
 
-    def display_info(self):
-        return f"name: {self.get_full_name()}\n email: {self.get_email()}\ncourses: {self.__enrolled_courses}"
-
-    def remove_courses(self, course):
-        self.__enrolled_courses.remove(course)
-
-    def add_courses(self,course):
-        self.__enrolled_courses.append(course)
-
-    def get_student_grade(self, course: Course):
-        if course not in self.__student_grade:
+    def calculate_gpa(self) -> float:
+        if not self.enrolled_courses:
             return 0.0
-        return self.__student_grade[course]
 
-
+        total_grade_points = sum(
+            course.get_student_grade(self).value
+            for course in self.enrolled_courses
+            if course.get_student_grade(self) is not None
+        )
+        return total_grade_points / len(self.enrolled_courses)
 
 

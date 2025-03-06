@@ -1,72 +1,65 @@
-from src.app.user import Student, Instructor, UserManager
 from src.app.course import Course
+from typing import List
+
+from src.app.instructor import Instructor
+from src.app.user import User
 
 class DatabaseManager:
-    def __init__(self, data_dir="data"):
-        self.data_dir = data_dir
-        self.users_file = f"{data_dir}/users.txt"
-        self.courses_file = f"{data_dir}/courses.txt"
-        self._create_directory_and_files()
-    
-    def _create_directory_and_files(self):
+    @staticmethod
+    def save_data(filename: str, data: List[str]) -> None:
         try:
-            os.makedirs(self.data_dir, exist_ok=True)
-            open(self.users_file, "a").close()
-            open(self.courses_file, "a").close()
-        except Exception as e:
-            print(f"Error creating directories: {e}")
-    
-    def save_users(self, users):
-        with open(self.users_file, "w") as f:
-            for user in users:
-                user_type = "instructor" if isinstance(user, Instructor) else "student"
-                f.write(f"{user._first_name},{user._last_name},{user.email},{user._password.decode('utf-8')},{user_type}\n")
-    
-    def load_users(self):
-        user_manager = UserManager()
+            with open(filename, 'w') as file:
+                file.writelines([f"{item}\n" for item in data])
+        except IOError as e:
+            print(f"Error saving data to {filename}: {e}")
+
+    @staticmethod
+    def load_data(filename: str) -> List[str]:
         try:
-            with open(self.users_file, "r") as f:
-                for line in f:
-                    first_name, last_name, email, password, user_type = line.strip().split(",")
-                    try:
-                        user_manager.register_user(user_type, first_name, last_name, email, password)
-                    except ValueError as e:
-                        print(f"Error loading user: {e}")
-            return user_manager.get_users()
-        except Exception as e:
-            print(f"Error loading users: {e}")
+            with open(filename, 'r') as file:
+                return [line.strip() for line in file]
+        except FileNotFoundError:
+            print(f"File {filename} not found. Returning an empty list.")
             return []
-    
-    def save_courses(self, courses):
-        with open(self.courses_file, "w") as f:
-            for course in courses:
-                instructor_email = course.instructor.email if course.instructor else "None"
-                student_grades = ";".join([f"{student.email}:{grade}" for student, grade in course.student_grades.items()])
-                f.write(f"{course.course_code},{course.course_name},{instructor_email},{student_grades}\n")
-    
-    def load_courses(self, users):
+        except IOError as e:
+            print(f"Error loading data from {filename}: {e}")
+            return []
+
+    @staticmethod
+    def save_users(filename: str, users: List['User']) -> None:
+        user_data = [f"{user.email},{user.first_name},{user.last_name},{user._hashed_password}" for user in users]
+        DatabaseManager.save_data(filename, user_data)
+
+    @staticmethod
+    def load_users(filename: str) -> List['User']:
+        users = []
+        for line in DatabaseManager.load_data(filename):
+            try:
+                email, first_name, last_name, hashed_password = line.split(',')
+                user = User(email, "placeholder", first_name, last_name)
+                user._hashed_password = hashed_password
+                users.append(user)
+            except ValueError as e:
+                print(f"Error processing user data: {e}")
+        return users
+
+    @staticmethod
+    def save_courses(filename: str, courses: List['Course']) -> None:
+        course_data = [
+            f"{course.course_code},{course.course_name},{course.instructor.email if course.instructor else 'None'},{course.max_capacity}"
+            for course in courses
+        ]
+        DatabaseManager.save_data(filename, course_data)
+
+    @staticmethod
+    def load_courses(filename: str, instructors: List['Instructor']) -> List['Course']:
         courses = []
-        try:
-            with open(self.courses_file, "r") as f:
-                for line in f:
-                    course_code, course_name, instructor_email, student_grades_str = line.strip().split(",")
-                
-                    instructor = next((user for user in users if user.email == instructor_email), None)
-                    
-                    course = Course(course_code, course_name)
-                    if instructor:
-                        instructor.create_course(course)
-                    
-                    if student_grades_str != "None":
-                        for student_grade in student_grades_str.split(";"):
-                            student_email, grade = student_grade.split(":")
-                            student = next((user for user in users if user.email == student_email), None)
-                            if student:
-                                student.enroll_to(course)
-                                student._grades[course] = grade
-                    
-                    courses.append(course)
-            return courses
-        except Exception as e:
-            print(f"Error loading courses: {e}")
-            return []
+        for line in DatabaseManager.load_data(filename):
+            try:
+                course_code, course_name, instructor_email, max_capacity = line.split(',')
+                instructor = next((inst for inst in instructors if inst.email == instructor_email), None)
+                course = Course(course_code, course_name, instructor, int(max_capacity))
+                courses.append(course)
+            except ValueError as e:
+                print(f"Error processing course data: {e}")
+        return courses
