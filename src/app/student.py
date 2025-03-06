@@ -1,28 +1,27 @@
 from typing import List
 
-from src.app.course import Course
 from user import User
 
 
 class Student(User):
     def __init__(self, email: str, password: str, first_name: str = '', last_name: str = ''):
         super().__init__(email, password, first_name, last_name)
-        self.enrolled_courses: List[Course] = []
+        self.enrolled_courses: List['Course'] = []
 
-    def enroll_in_course(self, course: Course) -> bool:
+    def enroll_in_course(self, course: 'Course') -> bool:
         if course.add_student(self) and course not in self.enrolled_courses:
             self.enrolled_courses.append(course)
             return True
         return False
 
-    def drop_course(self, course: Course) -> bool:
+    def drop_course(self, course: 'Course') -> bool:
         if course in self.enrolled_courses:
             course.remove_student(self)
             self.enrolled_courses.remove(course)
             return True
         return False
 
-    def view_enrolled_courses(self) -> List[Course]:
+    def view_enrolled_courses(self) -> List['Course']:
         return self.enrolled_courses
 
     def calculate_gpa(self) -> float:

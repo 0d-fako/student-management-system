@@ -1,7 +1,6 @@
 from enum import Enum
 from typing import Dict, Optional
 
-from src.app.student import Student
 
 
 class CourseGrade(Enum):
@@ -18,9 +17,9 @@ class Course:
         self.course_name = course_name
         self.instructor = instructor
         self.max_capacity = max_capacity
-        self.enrolled_students: Dict[Student, Optional[CourseGrade]] = {}
+        self.enrolled_students: Dict['Student', Optional[CourseGrade]] = {}
 
-    def add_student(self, student) -> bool:
+    def add_student(self, student: 'Student') -> bool:
         if len(self.enrolled_students) < self.max_capacity:
             self.enrolled_students[student] = None
             return True
