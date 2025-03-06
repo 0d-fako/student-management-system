@@ -35,6 +35,7 @@ class TestStudent(unittest.TestCase):
         self.assertIn("name: adekanbi khalid", info)
         self.assertIn("email: adekanbikhalid62@gmail.com", info)
         self.assertIn("courses", info)
+        #
 
 
 
