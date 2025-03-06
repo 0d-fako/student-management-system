@@ -1,4 +1,4 @@
-from app.user import Student
+from src.app.user import Student
 
 
 class Course:
