@@ -1,8 +1,8 @@
-from src.app.course import Course
+from app.course import Course
 from typing import List
 
-from src.app.instructor import Instructor
-from src.app.user import User
+from app.instructor import Instructor
+from app.user import User
 
 class DatabaseManager:
     @staticmethod

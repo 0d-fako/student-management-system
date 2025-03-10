@@ -1,9 +1,9 @@
 import unittest
 import os
-from src.app.course import Course
-from src.app.instructor import Instructor
-from src.app.user import User
-from src.app.database import DatabaseManager
+from app.course import Course
+from app.instructor import Instructor
+from app.user import User
+from app.database import DatabaseManager
 
 
 class TestDatabaseManager(unittest.TestCase):

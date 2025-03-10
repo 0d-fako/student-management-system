@@ -1,7 +1,7 @@
-from src.app.course import Course, CourseGrade
-from src.app.student import Student
-from src.app.instructor import Instructor
-from src.app.database import DatabaseManager
+from app.course import Course, CourseGrade
+from app.student import Student
+from app.instructor import Instructor
+from app.database import DatabaseManager
 
 import re
 
