@@ -16,7 +16,7 @@ class Course:
         self.course_name = course_name
         self.instructor = instructor
         self.max_capacity = max_capacity
-        self.enrolled_students: Dict['Student', Optional[CourseGrade]] = {}
+        self.enrolled_students: Dict['Student', 'CourseGrade'] = {}
 
     def add_student(self, student: 'Student') -> bool:
         if len(self.enrolled_students) < self.max_capacity:
@@ -34,7 +34,7 @@ class Course:
         if student in self.enrolled_students:
             self.enrolled_students[student] = grade
 
-    def get_student_grade(self, student) -> Optional[CourseGrade]:
+    def get_student_grade(self, student) -> CourseGrade:
         return self.enrolled_students.get(student)
 
     def get_students(self) -> List['Student']:

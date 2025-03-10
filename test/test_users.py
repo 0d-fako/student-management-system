@@ -1,6 +1,7 @@
 import unittest
 
-from app.user import Instructor, Student
+from src.app.instructor import Instructor
+from src.app.student import Student
 
 
 class UserTest(unittest.TestCase):

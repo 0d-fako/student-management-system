@@ -176,7 +176,7 @@ class SystemManagerApp:
                     print(self.create_course(course_code, course_name, max_capacity))
                 elif choice == '3':
                     student_email = input("Enter student email: ")
-                    course_code = input("Enter course code: ")
+                    course_code = input("E1nter course code: ")
                     grade = CourseGrade[input("Enter grade (A, B, C, D, F): ")]
                     print(self.assign_grade(student_email, course_code, grade))
                 elif choice == '4':

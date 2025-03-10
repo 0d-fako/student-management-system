@@ -19,7 +19,6 @@ class TestDatabaseManager(unittest.TestCase):
         self.mock_course = Course("CS101", "Intro to Computer Science", self.mock_instructor, 30)
 
     def tearDown(self):
-        # Clean up temporary files
         for file in [self.temp_file, self.temp_users_file, self.temp_courses_file]:
             if os.path.exists(file):
                 os.remove(file)
