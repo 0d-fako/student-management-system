@@ -1,6 +1,6 @@
 from typing import List
 
-from src.app.user import User
+from app.user import User
 
 
 class Student(User):

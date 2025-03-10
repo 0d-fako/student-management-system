@@ -1,4 +1,4 @@
-from src.app.authentication import AuthenticationService
+from app.authentication import AuthenticationService
 
 
 class User:

@@ -1,7 +1,7 @@
 from typing import List
 
-from src.app.course import Course, CourseGrade
-from src.app.user import User
+from app.course import Course, CourseGrade
+from app.user import User
 
 
 class Instructor(User):
