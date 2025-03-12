@@ -14,11 +14,16 @@
     </properties>
 
     <dependencies>
-        <!-- Add your dependencies here, like jBCrypt -->
+        <!-- Add your dependencies here -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.5.2</version>
         </dependency>
     </dependencies>
 </project>
