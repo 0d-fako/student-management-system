@@ -1,0 +1,3 @@
+CSC2,Intro to Programming,Ollunimati@gmail.com,30
+csc222,Introduction,Ollunimati@gmail.com,30
+CSC 202,Intro,olllu@gmail.com,30
