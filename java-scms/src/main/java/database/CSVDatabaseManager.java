@@ -29,13 +29,15 @@ public class CSVDatabaseManager implements DatabaseManager {
             String path = tableName + ".csv";
 
             File table = new File(path);
-            if (table.exists() == false) {
-                try (FileWriter csvWriter = new FileWriter(table)) {
-                    csvWriter.write(String.join(",", headers) + "\n");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            if (table.exists() == false) createTable(table, headers);
+        }
+    }
+
+    private void createTable(File table, String[] headers) {
+        try (FileWriter csvWriter = new FileWriter(table)) {
+            csvWriter.write(String.join(",", headers) + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
