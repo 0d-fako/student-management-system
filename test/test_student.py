@@ -2,14 +2,6 @@ import unittest
 from src.app.student import Student
 
 
-class Course:
-    def __init__(self, name, instructor):
-        self.name = name
-        self.instructor = instructor
-
-    def get_instructor(self):
-        return self.instructor
-
 
 class TestStudent(unittest.TestCase):
     def setUp(self):
@@ -37,7 +29,7 @@ class TestStudent(unittest.TestCase):
         self.assertIn("courses", info)
         #
 
-
+  
 
 if __name__ == "__main__":
     unittest.main()
