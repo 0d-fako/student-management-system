@@ -43,6 +43,8 @@ class DatabaseManager:
             last_id = int(rows[-1][f"{table_name[:-1]}_id"])
             return last_id + 1
 
+
+
     @staticmethod
     def save(table_name, obj):
         filename = DatabaseManager.get_file_path(table_name)
