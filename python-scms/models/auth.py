@@ -1,4 +1,6 @@
 import csv
+from email_validator import validate_email, EmailNotValidError
+
 import bcrypt
 
 class Authentication:
@@ -19,3 +21,11 @@ class Authentication:
                 if row['email'] == email and Authentication.is_valid_password(password, row):
                     return True
         return False
+
+    @staticmethod
+    def is_valid_email(email):
+        try:
+            validate_email(email)
+            return True
+        except EmailNotValidError:
+            return False
