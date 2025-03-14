@@ -1,2 +1,1 @@
-instructor_id,name,email,password
-1,Daniel,dan@iel.com,$2b$12$ZlIh4GOYI/RNCR03oii0a.3Q3v7U3496CPTns9fJmpMjGc7j1Sb4K
+students,instructors,courses,enrollments
