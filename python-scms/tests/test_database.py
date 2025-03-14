@@ -1,3 +1,4 @@
+import tempfile
 import unittest
 import os
 import sys
@@ -11,17 +12,30 @@ class TestDatabaseManager(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.temp_dir = tempfile.TemporaryDirectory()
+        for key in DATABASE_CONFIG.keys():
+            DATABASE_CONFIG[key] = os.path.join(cls.temp_dir.name, f"{key}.csv")
         DatabaseManager.initialize()
 
+    @classmethod
+    def tearDownClass(cls):
+        cls.temp_dir.cleanup()
+
     def setUp(self):
-        for file_path in DATABASE_CONFIG.values():
-            if os.path.exists(file_path):
-                with open(file_path, 'w') as file:
-                    file.write(','.join(DATABASE_CONFIG.keys()) + '\n')
+        tables = {
+            'students': ['student_id', 'name', 'email', 'password'],
+            'instructors': ['instructor_id', 'name', 'email', 'password'],
+            'courses': ['course_id', 'title', 'instructor_id'],
+            'enrollments': ['student_id', 'course_id', 'grade'],
+        }
+        for table, headers in tables.items():
+            path = DATABASE_CONFIG[table]
+            with open(path, 'w') as file:
+                file.write(','.join(headers) + '\n')
 
     def test_initialize_creates_files(self):
         for table, path in DATABASE_CONFIG.items():
-            self.assertTrue(os.path.exists(path))
+            self.assertTrue(os.path.exists(path), f"{path} does not exist")
 
     def test_save_and_fetch_all(self):
         class Student:

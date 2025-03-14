@@ -1,1 +1,1 @@
-students,instructors,courses,enrollments
+student_id,name,email,password
