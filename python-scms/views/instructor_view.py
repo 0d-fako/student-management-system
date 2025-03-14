@@ -18,7 +18,7 @@ class InstructorDashboard:
             elif choice == '2':
                 InstructorDashboard.view_course_students(instructor)
             elif choice == '3':
-                InstructorDashboard.grade_student(instructor)
+                InstructorDashboard.score_student(instructor)
             elif choice == '4':
                 InstructorDashboard.create_course(instructor)
             elif choice == '5':
@@ -58,7 +58,7 @@ class InstructorDashboard:
                 print(f"{course['title']:<20} | {student['name']:<10} | {enr.get('grade') if len(enr['grade']) > 0 else 'N/A'}")
 
     @staticmethod
-    def grade_student(instructor):
+    def score_student(instructor):
         courses = DatabaseManager.filter_records('courses', 'instructor_id', instructor.instructor_id)
         for course in courses:
             print(f"{course['course_id']}: {course['title']}")
@@ -67,11 +67,12 @@ class InstructorDashboard:
         enrollments = DatabaseManager.filter_records('enrollments', 'course_id', course_id)
         for i, enr in enumerate(enrollments):
             student = DatabaseManager.filter_records('students', 'student_id', enr['student_id'])[0]
-            print(f"{i + 1}. Student: {student['name']}, Current Grade: {enr.get('grade', 'N/A')}")
+            print(f"{i + 1}. Student: {student['name']}, Current Grade: {enr.get('grade') if len(enr['grade']) > 0 else 'N/A"'}")
 
         selection = int(input("Select student number: ")) - 1
         if 0 <= selection < len(enrollments):
-            new_grade = input("Enter new grade: ")
+            score = InstructorDashboard.collect_score()
+            new_grade = InstructorDashboard.get_grade(score)
             enrollment = Enrollment(
                 enrollments[selection]['student_id'],
                 enrollments[selection]['course_id'],
@@ -81,3 +82,15 @@ class InstructorDashboard:
             print("Grade updated!")
         else:
             print("Invalid selection!")
+
+    @staticmethod
+    def collect_score():
+        score = int(input("Enter score (0 - 100): "))
+        while score < 0 or score > 100:
+            print("Invalid score range!!!")
+            score = int(input("Enter score ( must be btw 0 - 100): "))
+        return score
+
+    @staticmethod
+    def get_grade(score):
+        return "A" if score >= 80 else "B" if score >= 60 else "C" if score >= 50 else "D" if score >= 40 else "E" if score >= 30 else "F"
