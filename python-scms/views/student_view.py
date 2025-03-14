@@ -28,6 +28,9 @@ class StudentDashboard:
     @staticmethod
     def view_all_courses():
         courses = DatabaseManager.fetch_all('courses')
+        if len(courses) == 0:
+            print("\nNo courses found!\n")
+            return
         for course in courses:
             instructor = DatabaseManager.filter_records('instructors', 'instructor_id', course['instructor_id'])[0]
             print(f"ID: {course['course_id']}, Title: {course['title']}, Instructor: {instructor['name']}")
@@ -35,6 +38,9 @@ class StudentDashboard:
     @staticmethod
     def view_registered_courses(student):
         enrollments = DatabaseManager.filter_records('enrollments', 'student_id', student.student_id)
+        if len(enrollments) == 0:
+            print("\nNo enrollments found!\n")
+            return
         for enr in enrollments:
             course = DatabaseManager.filter_records('courses', 'course_id', enr['course_id'])[0]
             instructor = DatabaseManager.filter_records('instructors', 'instructor_id', course['instructor_id'])[0]
@@ -44,23 +50,31 @@ class StudentDashboard:
     @staticmethod
     def enroll_in_course(student):
         courses = DatabaseManager.fetch_all('courses')
+        if len(courses) == 0:
+            print("\nNo courses!\n")
+            return
+
+        print("\n=== Enroll in Course ===")
         for course in courses:
             print(f"{course['course_id']}: {course['title']}")
-        course_id = input("Enter course ID to enroll: ")
+        course_id = input("\nEnter course ID to enroll: ")
 
-        # Check if already enrolled
         existing = DatabaseManager.filter_records('enrollments', 'student_id', student.student_id)
         if any(enr['course_id'] == course_id for enr in existing):
-            print("Already enrolled!")
+            print("\nAlready enrolled!\n")
             return
 
         enrollment = Enrollment(student.student_id, course_id)
         DatabaseManager.save('enrollments', enrollment)
-        print("Enrollment successful!")
+        print("\nEnrollment successful!\n")
 
     @staticmethod
     def view_course_grades(student):
         enrollments = DatabaseManager.filter_records('enrollments', 'student_id', student.student_id)
+        if len(enrollments) == 0:
+            print("\nNo enrollments!\n")
+            return
+
         for enr in enrollments:
             course = DatabaseManager.filter_records('courses', 'course_id', enr['course_id'])[0]
             print(f"Course: {course['title']}, Grade: {enr.get('grade', 'N/A')}")

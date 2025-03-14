@@ -16,6 +16,10 @@ class MainMenu:
 
             if choice == '1':
                 email = input("Email: ")
+                if not Authentication.is_valid_email(email):
+                    print("Invalid Email")
+                    print("Going back to main menu.")
+                    continue
                 password = input("Password: ")
                 is_student = input("Are you a student (y/n): ").lower().startswith('y')
                 if Authentication.verify_user(email, password, "student" if is_student else "instructor"):
@@ -39,23 +43,27 @@ class MainMenu:
     @staticmethod
     def get_student(email):
         students = DatabaseManager.fetch_all('students')
-        for s in students:
-            if s['email'] == email:
-                return Student(s['student_id'], s['name'], s['email'], '')
+        for student in students:
+            if student['email'] == email:
+                return Student(student['student_id'], student['name'], student['email'], '')
         return None
 
     @staticmethod
     def get_instructor(email):
         instructors = DatabaseManager.fetch_all('instructors')
-        for i in instructors:
-            if i['email'] == email:
-                return Instructor(i['instructor_id'], i['name'], i['email'], '')
+        for instructor in instructors:
+            if instructor['email'] == email:
+                return Instructor(instructor['instructor_id'], instructor['name'], instructor['email'], '')
         return None
 
     @staticmethod
     def register_student():
         name = input("Fullname: ")
         email = input("Email: ")
+        if not Authentication.is_valid_email(email):
+            print("\nInvalid Email. start over again. be careful next time!\n")
+            MainMenu.register_student()
+
         password = input("Password: ")
         if DatabaseManager.is_user_registered(email, 'student'):
             print("Email already registered!")
@@ -72,12 +80,19 @@ class MainMenu:
     def register_instructor():
         name = input("Fullname: ")
         email = input("Email: ")
-        password = input("Password: ")
+        if not Authentication.is_valid_email(email):
+            print("\nInvalid Email. Start over again. be careful next time!\n")
+            MainMenu.register_instructor()
         if DatabaseManager.is_user_registered(email, 'instructor'):
             print("Email already registered!")
             option = input("Do you wish to try again? (y/n): ").lower()
             if option.startswith('y'): MainMenu.register_instructor()
-            else: return
+            elif option.startswith('n'): MainMenu.display()
+            else:
+                print("Invalid choice! Taking you back to main menu")
+        password = input("Password: ")
+
+
         instructor_id = DatabaseManager.get_next_id('instructors')
         instructor = Instructor(instructor_id, name, email, password)
         DatabaseManager.save('instructors', instructor)
