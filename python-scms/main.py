@@ -10,6 +10,6 @@ if __name__ == '__main__':
         DatabaseManager.initialize()
         MainMenu.display()
     except KeyboardInterrupt:
-        print('Interrupted')
+        print('Application terminated unexpectedly.')
 
 
